@@ -22,7 +22,7 @@ const ProductsPage = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const [filters, setFilters] = useState({
     search: searchParams.get("search") || "",
-    category: searchParams.get("category") || "",
+    category: searchParams.get("category") || "all", // Changed default from "" to "all"
     minPrice: searchParams.get("minPrice") || "",
     maxPrice: searchParams.get("maxPrice") || "",
     condition: {
@@ -65,8 +65,8 @@ const ProductsPage = () => {
       );
     }
     
-    // Apply category filter
-    if (filters.category) {
+    // Apply category filter - modified to handle "all" value
+    if (filters.category && filters.category !== "all") {
       result = result.filter(p => p.category === filters.category);
     }
     
@@ -117,7 +117,7 @@ const ProductsPage = () => {
     const newParams = new URLSearchParams();
     
     if (filters.search) newParams.set("search", filters.search);
-    if (filters.category) newParams.set("category", filters.category);
+    if (filters.category && filters.category !== "all") newParams.set("category", filters.category);
     if (filters.minPrice) newParams.set("minPrice", filters.minPrice);
     if (filters.maxPrice) newParams.set("maxPrice", filters.maxPrice);
     if (filters.sort) newParams.set("sort", filters.sort);
@@ -136,7 +136,7 @@ const ProductsPage = () => {
   const clearFilters = () => {
     setFilters({
       search: "",
-      category: "",
+      category: "all",  // Changed from "" to "all"
       minPrice: "",
       maxPrice: "",
       condition: {
@@ -194,7 +194,7 @@ const ProductsPage = () => {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
