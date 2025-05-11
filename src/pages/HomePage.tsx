@@ -1,17 +1,29 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/data/categories";
 import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 
 const HomePage = () => {
   // Get featured products (for this demo, just take the first 3)
   const featuredProducts = products.slice(0, 3);
+  const [isLoading, setIsLoading] = useState(true);
+  const [heroImageLoaded, setHeroImageLoaded] = useState(false);
   
   // Choose featured categories
   const featuredCategories = categories.slice(0, 6);
+
+  // Simulate loading time for demo purposes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 600);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div>
@@ -39,11 +51,18 @@ const HomePage = () => {
               </Link>
             </div>
           </div>
-          <div className="md:w-1/2 flex justify-center">
+          <div className="md:w-1/2 flex justify-center relative">
+            {!heroImageLoaded && (
+              <div className="rounded-lg bg-gray-200 w-full h-64 md:h-80 flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
             <img 
               src="https://images.unsplash.com/photo-1562280963-8a5475740f9d?ixlib=rb-4.0.3" 
               alt="TradeCraft Marketplace" 
-              className="rounded-lg shadow-lg max-w-full h-auto"
+              className={`rounded-lg shadow-lg max-w-full h-auto transition-opacity duration-300 ${heroImageLoaded ? 'opacity-100' : 'opacity-0 absolute'}`}
+              loading="eager" // Load hero image eagerly as it's above the fold
+              onLoad={() => setHeroImageLoaded(true)}
             />
           </div>
         </div>
@@ -82,9 +101,17 @@ const HomePage = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {isLoading ? (
+              // Show skeletons while loading
+              Array(3).fill(0).map((_, index) => (
+                <ProductCardSkeleton key={index} />
+              ))
+            ) : (
+              // Show actual product cards when loaded
+              featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            )}
           </div>
         </div>
       </section>

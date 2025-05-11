@@ -7,6 +7,7 @@ import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { formatCurrency } from "@/lib/utils";
+import { useState } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -30,15 +31,23 @@ const conditionLabels = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <Card className="overflow-hidden flex flex-col h-full transition-all hover:shadow-md">
       <Link to={`/products/${product.id}`} className="overflow-hidden">
-        <div className="h-48 overflow-hidden">
+        <div className="h-48 overflow-hidden relative bg-gray-100">
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
           <img
             src={product.images[0] || "/placeholder.svg"}
             alt={product.title}
-            className="w-full h-full object-cover transition-transform hover:scale-105"
+            className={`w-full h-full object-cover transition-all duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
           />
         </div>
       </Link>
